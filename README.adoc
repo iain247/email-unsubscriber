@@ -4,3 +4,5 @@ Requires the following environment variables:
 
 * EMAIL
 * PASSWORD
+
+Emails with unsubscribe links that are clicked successfully are moved to the `unsubscribed` folder. If any links result in an error or an non-OK status code, the email is moved to the "to-unsubscribe" folder.
