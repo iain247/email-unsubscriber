@@ -34,6 +34,7 @@ def extract_links_from_html(message):
                 # get the text surrounding the <a> tag
                 surrounding_text = link.find_parent().get_text(strip=True).lower()
                 if ("unsubscribe" in link_text or "unsubscribe" in surrounding_text) and ("http" in link["href"] or "https" in link["href"]):
+                    print("Found a link: " + link["href"])
                     yield link["href"]
 
 def search_for_links(mail):
