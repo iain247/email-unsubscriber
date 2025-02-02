@@ -1,5 +1,6 @@
 = Email Unsubscriber
 
-Pretty much copied directly from this video:
+Requires the following environment variables:
 
-https://www.youtube.com/watch?v=rBEQL2tC2xY&t=1375s
+* EMAIL
+* PASSWORD
