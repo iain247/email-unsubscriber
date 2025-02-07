@@ -37,22 +37,7 @@ def extract_links_from_html(message):
                     print("Found a link: " + link["href"])
                     yield link["href"]
 
-def search_for_links(mail):
-    mail.idle()
-    response = mail.idle_check(timeout=300)
-    mail.idle_done()
-
-    if not response:
-        mail.noop()
-        return
-
-    unread_emails = mail.search('UNSEEN')
-    if not unread_emails:
-        return
-
-    # RFC822 tells the email server to provide all contents of the email
-    fetch_results = mail.fetch(unread_emails, ['RFC822']).items()
-
+def search_for_links(fetch_results):
     # dictionary containing message id keys, and unsubscribe link values
     message_unsubscribe_links = {}
 
@@ -70,6 +55,24 @@ def search_for_links(mail):
             message_unsubscribe_links[message_id] = unsubscribe_links
 
     return message_unsubscribe_links
+
+def read_emails(mail):
+    mail.idle()
+    response = mail.idle_check(timeout=300)
+
+    if not response:
+        mail.noop()
+        return
+
+    mail.idle_done()
+
+    unread_emails = mail.search('UNSEEN')
+    if not unread_emails:
+        return
+
+    # RFC822 tells the email server to provide all contents of the email
+    return mail.fetch(unread_emails, ['RFC822']).items()
+
 
 def click_links(unsubscribe_links):
     try:
@@ -96,13 +99,20 @@ def main():
     mail = connect_to_mail(username, password)
 
     while True:
-            message_unsubscribe_links = search_for_links(mail)
+        try:
+            fetch_results = read_emails(mail)
+            message_unsubscribe_links = search_for_links(fetch_results)
             if message_unsubscribe_links:
                 for message_id, unsubscribe_links in message_unsubscribe_links.items():
                     if click_links(unsubscribe_links):
                         move_email(mail, message_id, "unsubscribed")
                     else:
                         move_email(mail, message_id, "to-unsubscribe")
+        except Exception as e:
+            print(f"An error occurred, re-logging into email and retrying\n{e}")
+            mail.logout()
+            mail.login(username, password)
+
 
 
 if __name__ == '__main__':
