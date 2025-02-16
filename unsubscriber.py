@@ -121,13 +121,14 @@ def main():
     while True:
         try:
             fetch_results = read_emails(mail)
-            message_unsubscribe_links = search_for_links(fetch_results, approved_domains)
-            if message_unsubscribe_links:
-                for message_id, unsubscribe_links in message_unsubscribe_links.items():
-                    if click_links(unsubscribe_links):
-                        move_email(mail, message_id, "unsubscribed")
-                    else:
-                        move_email(mail, message_id, "to-unsubscribe")
+            if fetch_results:
+                message_unsubscribe_links = search_for_links(fetch_results, approved_domains)
+                if message_unsubscribe_links:
+                    for message_id, unsubscribe_links in message_unsubscribe_links.items():
+                        if click_links(unsubscribe_links):
+                            move_email(mail, message_id, "unsubscribed")
+                        else:
+                            move_email(mail, message_id, "to-unsubscribe")
         except Exception as e:
             print(f"An error occurred, re-logging into email and retrying.\n{e}")
             traceback.print_exc()
