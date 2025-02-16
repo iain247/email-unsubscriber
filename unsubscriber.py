@@ -5,6 +5,7 @@ import email
 import os
 import chardet
 import requests
+import traceback
 
 APPROVED_DOMAINS_FILE = "approved_domains.txt"
 
@@ -129,6 +130,7 @@ def main():
                         move_email(mail, message_id, "to-unsubscribe")
         except Exception as e:
             print(f"An error occurred, re-logging into email and retrying.\n{e}")
+            traceback.print_exc()
             mail = connect_to_mail(username, password)
 
 
